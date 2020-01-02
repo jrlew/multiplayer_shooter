@@ -1,0 +1,10 @@
+# server
+**/bin
+**/obj
+
+# web
+**/node_modules
+
+# ide
+**/.vs
+**/.vscode

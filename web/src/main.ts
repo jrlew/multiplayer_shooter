@@ -1,10 +1,9 @@
-import { Player } from './player';
 import { HubConnection, HubConnectionBuilder } from "@aspnet/signalr";
-import { SSL_OP_EPHEMERAL_RSA } from 'constants';
+import { Player } from "./player";
 
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = "0";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-let player = new Player();
+const player = new Player();
 
 function buildConnection(): HubConnection {
     return new HubConnectionBuilder()
@@ -14,7 +13,7 @@ function buildConnection(): HubConnection {
 
 function attachConnectionListeners(connection: HubConnection) {
     connection.on("ReceiveMessage", (user, message) => {
-        console.log(user, ' - ', message);
+        console.log(user, " - ", message);
     });
 
     connection.on("RegistrationComplete", (localPlayerGuid) => {
@@ -34,7 +33,7 @@ async function connect(connection: HubConnection) {
     } catch (error) {
         console.log(error);
     }
-    console.log('connected');
+    console.log("connected");
 }
 
 async function register(connection: HubConnection) {
@@ -63,7 +62,7 @@ async function updatePlayerLocation(connection: HubConnection, playerGuid: strin
 
 async function sleep(sleepInMilliseconds: number) {
     return new Promise((res, rej) => {
-        setTimeout(function () {
+        setTimeout(() => {
             res("whatever");
         }, sleepInMilliseconds);
     });
@@ -76,13 +75,13 @@ async function main() {
     await register(connection);
     await getPlayerLocation(connection, player.id);
     player.location.x = 2;
-    player.location.y = 3
+    player.location.y = 3;
     await updatePlayerLocation(connection, player.id);
     await sleep(500);
     await getPlayerLocation(connection, player.id);
     // await connection.stop();
     while (true) {
-
+        //
     }
 }
 

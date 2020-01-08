@@ -5,23 +5,24 @@ namespace Shooter.Game
 {
     public static class State
     {
-        public static List<Player> PlayerList { get; set; }
+        public static List<Player> Players { get; set; }
+        public static List<Projectile> Projectiles { get; set; }
 
         public static void Initialize()
         {
-            PlayerList = new List<Player>();
+            Players = new List<Player>();
         }
 
         public static Player AddPlayer()
         {
             var player = new Player();
-            PlayerList.Add(player);
+            Players.Add(player);
             return player;
         }
 
         public static Player GetPlayerById(Guid playerId)
         {
-            return PlayerList.Find(x => x.Id == playerId);
+            return Players.Find(x => x.Id == playerId);
         }
     }
 }

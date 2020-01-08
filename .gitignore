@@ -4,6 +4,7 @@
 
 # web
 **/node_modules
+**/dist
 
 # ide
 **/.vs

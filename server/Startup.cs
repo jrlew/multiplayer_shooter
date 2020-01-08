@@ -20,7 +20,14 @@ namespace Shooter
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
+            {
+                builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:4200");
+            }));
             services.AddSignalR();
         }
 
@@ -38,16 +45,13 @@ namespace Shooter
                 app.UseHsts();
             }
 
-            // app.UseHttpsRedirection();
-            app.UseStaticFiles();
+            app.UseCors("CorsPolicy");
 
             app.UseRouting();
 
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
                 endpoints.MapHub<GameHub>("/game");
             });
 

@@ -23,12 +23,26 @@ namespace Shooter.Hubs
             await Clients.Caller.SendAsync("PlayerLocation", player.Id, player.Location);
         }
 
+        public void GetPlayers()
+        {
+            State.Players.ForEach(async (player) =>
+            {
+                await Clients.Caller.SendAsync("PlayerLocation", player.Id, player.Location);
+            });
+        }
+
+        public void UpdatePlayer(Player player)
+        {
+            var playerToUpdate = State.GetPlayerById(player.Id);
+            playerToUpdate.Location = player.Location;
+        }
+
         public void UpdatePlayerLocation(Guid playerId, string newCoordinate)
         {
             Console.WriteLine("UpdatePlayerLocation Called");
 
             Coordinates newCoords = JsonConverter.Deserialize<Coordinates>(newCoordinate);
-            State.GetPlayerById(playerId).UpdateLocation(newCoords);
+            State.GetPlayerById(playerId).Location = newCoords;
         }
     }
 }

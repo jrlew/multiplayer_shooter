@@ -1,7 +1,9 @@
+import { Unit } from './../shared/unit';
 import { ConnectionService } from '../core/connection.service';
 import { Component, OnInit } from '@angular/core';
 import { HubConnection } from '@aspnet/signalr';
 import { Player } from '@app/shared/player';
+import { IEasel, Easel } from '@app/shared/easel';
 
 @Component({
   selector: 'app-game',
@@ -11,13 +13,17 @@ import { Player } from '@app/shared/player';
 export class GameComponent implements OnInit {
 
   private connection: HubConnection;
-
-  private player: Player;
+  private easel: IEasel;
+  private player: Unit;
 
   constructor(private connectionService: ConnectionService) { }
 
   ngOnInit() {
+    this.easel = Easel.getInstance();
     this.start();
+
+    this.easel.background.context.fillStyle = 'green';
+    this.easel.background.context.fillRect(0, 0, this.easel.width, this.easel.height);
   }
 
   private attachConnectionListeners() {
@@ -25,13 +31,11 @@ export class GameComponent implements OnInit {
       console.log(user, ' - ', message);
     });
 
-    this.connection.on('RegistrationComplete', (localPlayerGuid) => {
-      // player.id = localPlayerGuid;
+    this.connection.on('RegistrationComplete', async (localPlayerGuid) => {
       console.log(`RegistrationComplete - playerGuid: ${localPlayerGuid}`);
-      this.player = new Player();
-      this.player.id = localPlayerGuid;
-      this.player.location.x = 8;
-      this.player.location.y = 9;
+      this.player = new Unit(8, 8, 'blue-archer.png', localPlayerGuid);
+      await this.player.loadImage();
+      this.easel.foreground.context.drawImage(this.player.image, this.player.location.x, this.player.location.y);
     });
 
     this.connection.on('PlayerLocation', (playerId, playerLocation) => {

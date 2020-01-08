@@ -1,4 +1,4 @@
-export class Coordinates {
+export class Coordinates implements ICoordinates {
   public x: number;
   public y: number;
 
@@ -6,4 +6,9 @@ export class Coordinates {
       this.x = x;
       this.y = y;
   }
+}
+
+export interface ICoordinates {
+  x: number;
+  y: number;
 }

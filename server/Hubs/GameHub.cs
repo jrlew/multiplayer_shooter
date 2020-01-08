@@ -11,7 +11,7 @@ namespace Shooter.Hubs
         public async Task Register()
         {
             var player = State.AddPlayer();
-            await Clients.Caller.SendAsync("RegistrationComplete", player.Id);
+            await Clients.Caller.SendAsync(ClientMethods.RegistrationComplete, player.Id);
         }
 
         public async Task GetPlayerLocation(Guid playerId)
@@ -20,14 +20,14 @@ namespace Shooter.Hubs
 
             var player = State.GetPlayerById(playerId);
 
-            await Clients.Caller.SendAsync("PlayerLocation", player.Id, player.Location);
+            await Clients.Caller.SendAsync(ClientMethods.PlayerLocation, player.Id, player.Location);
         }
 
         public void GetPlayers()
         {
             State.Players.ForEach(async (player) =>
             {
-                await Clients.Caller.SendAsync("PlayerLocation", player.Id, player.Location);
+                await Clients.Caller.SendAsync(ClientMethods.PlayerLocation, player.Id, player.Location);
             });
         }
 

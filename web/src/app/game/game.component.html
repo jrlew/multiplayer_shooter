@@ -1,12 +1,16 @@
 <style>
   canvas {
-    position:absolute;
+    position: absolute;
   }
+
   #background {
     z-index: 1;
   }
+
   #foreground {
-    z-index: 2;  }
+    z-index: 2;
+  }
+
   #overlay {
     z-index: 3;
   }
@@ -14,10 +18,9 @@
 
 <h1>Hello There</h1>
 
-<button (click)="getPlayers()"> Get Players </button>
+<button (click)="getPlayers()">Get Players</button>
+<button (click)="getState()">Get State</button>
 
 <canvas id="background"></canvas>
 <canvas id="foreground"></canvas>
 <canvas id="overlay"></canvas>
-
-

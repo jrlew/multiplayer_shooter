@@ -1,6 +1,7 @@
+import { KeyboardCodes } from './../shared/keyboard-codes';
 import { Unit } from './../shared/unit';
 import { ConnectionService } from '../core/connection.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { HubConnection } from '@aspnet/signalr';
 import { Player } from '@app/shared/player';
 import { IEasel, Easel } from '@app/shared/easel';
@@ -10,11 +11,13 @@ import { IEasel, Easel } from '@app/shared/easel';
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss']
 })
-export class GameComponent implements OnInit {
+export class GameComponent implements OnDestroy, OnInit {
 
   private connection: HubConnection;
   private easel: IEasel;
   private player: Unit;
+
+  private state;
 
   constructor(private connectionService: ConnectionService) { }
 
@@ -26,9 +29,18 @@ export class GameComponent implements OnInit {
     this.easel.background.context.fillRect(0, 0, this.easel.width, this.easel.height);
   }
 
+  ngOnDestroy() {
+    this.connection.invoke('Deregister', this.player.id);
+    this.connection.stop();
+  }
+
   private attachConnectionListeners() {
     this.connection.on('ReceiveMessage', (user, message) => {
       console.log(user, ' - ', message);
+    });
+
+    this.connection.on('ReceiveState', (state) => {
+      console.log('State:', state);
     });
 
     this.connection.on('RegistrationComplete', async (localPlayerGuid) => {
@@ -44,7 +56,52 @@ export class GameComponent implements OnInit {
     });
   }
 
+  @HostListener('unload')
+  onUnload() {
+    this.connection.invoke('Deregister', this.player.id);
+    this.connection.stop();
+  }
+
+  @HostListener('close')
+  onClose() {
+    this.connection.invoke('Deregister', this.player.id);
+    this.connection.stop();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    console.log(event);
+    switch (event.key) {
+      case 'ArrowUp':
+        // onArrowUp();
+        this.player.moveUp();
+        break;
+      case 'ArrowDown':
+        // onArrowDown();
+        this.player.moveRight();
+        break;
+      case 'ArrowLeft':
+        // onArrowLeft();
+        this.player.moveLeft();
+        break;
+      case 'ArrowRight':
+        // onArrowRight();
+        this.player.moveRight();
+        break;
+    }
+  }
+
+  private async getState() {
+    try {
+      await this.connection.invoke('GetCurrentState');
+    } catch (error) {
+      console.log('RegistrationError: ', error);
+    }
+  }
+
   private async getPlayers() {
+    console.log('LocalPlayer');
+    console.log(this.player);
     try {
       await this.connection.invoke('GetPlayers');
     } catch (error) {
@@ -69,6 +126,14 @@ export class GameComponent implements OnInit {
     }
   }
 
+  private async waitForNextFrame() {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        res();
+      }, 500);
+    });
+  }
+
   private async start() {
     this.connection = await this.connectionService.getConnection();
 
@@ -76,5 +141,14 @@ export class GameComponent implements OnInit {
     await this.register();
 
     await this.updatePlayer(this.player);
+
+    // while (true) {
+    //   await this.waitForNextFrame();
+    //   this.easel.foreground.clear();
+    //   let framePlayers = await this.getPlayers();
+    //   // framePlayers.
+
+    // }
+
   }
 }

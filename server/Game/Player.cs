@@ -6,13 +6,13 @@ namespace Shooter.Game
     public class Player
     {
         [JsonPropertyName("id")]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         [JsonPropertyName("location")]
         public Coordinates Location { get; set; }
 
-        public Player()
+        public Player(string playerId)
         {
-            Id = Guid.NewGuid();
+            Id = playerId;
             Location = new Coordinates(0, 0);
         }
     }

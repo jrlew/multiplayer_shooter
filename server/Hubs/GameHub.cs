@@ -8,13 +8,43 @@ namespace Shooter.Hubs
 {
     public class GameHub : Hub
     {
-        public async Task Register()
+        public async override Task OnConnectedAsync()
         {
-            var player = State.AddPlayer();
+            var player = State.AddPlayer(Context.ConnectionId);
+            await Groups.AddToGroupAsync(Context.ConnectionId, "Players");
             await Clients.Caller.SendAsync(ClientMethods.RegistrationComplete, player.Id);
+
+            await base.OnConnectedAsync();
         }
 
-        public async Task GetPlayerLocation(Guid playerId)
+        public async override Task OnDisconnectedAsync(Exception exception)
+        {
+            Console.WriteLine("Deregistering");
+            State.RemovePlayer(Context.ConnectionId);
+            Console.WriteLine(State.Players.Count);
+
+            await base.OnDisconnectedAsync(exception);
+        }
+
+        //public void Deregister(string playerId)
+        //{
+        //    Console.WriteLine("Deregistering");
+        //    State.RemovePlayer(playerId);
+        //    Console.WriteLine(State.Players.Count);
+        //}
+
+        //public async Task Register()
+        //{
+        //    var player = State.AddPlayer();
+        //    await Clients.Caller.SendAsync(ClientMethods.RegistrationComplete, player.Id);
+        //}
+
+        public async Task GetCurrentState()
+        {
+            await Clients.Caller.SendAsync(ClientMethods.ReceiveState, State.GetState());
+        }
+
+        public async Task GetPlayerLocation(string playerId)
         {
             Console.WriteLine("GetPlayerLocation Called");
 
@@ -37,7 +67,7 @@ namespace Shooter.Hubs
             playerToUpdate.Location = player.Location;
         }
 
-        public void UpdatePlayerLocation(Guid playerId, string newCoordinate)
+        public void UpdatePlayerLocation(string playerId, string newCoordinate)
         {
             Console.WriteLine("UpdatePlayerLocation Called");
 
